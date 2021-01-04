@@ -5,9 +5,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -16,9 +18,10 @@ import com.example.recycler157_1.databinding.FragmentFirstBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirstFragment extends Fragment {
+public class FirstFragment extends Fragment implements WordsAdapter.PasarElemento {
 
     private FragmentFirstBinding mBinding;
+    private List<String> listado = new ArrayList<>();
 
     @Override
     public View onCreateView(
@@ -33,20 +36,40 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //Instanciamos el adapter y le pasamos el listado de datos
-        WordsAdapter mAdapter = new WordsAdapter(wordList());
+        WordsAdapter mAdapter = new WordsAdapter(wordList(),this);
         //Le pasamos el adapter a nuestro Recycler View
         mBinding.rv.setAdapter(mAdapter);
         // le indicamos al RecyclerView como mostrar los elementos, podria ser grid, o staggered
         mBinding.rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
+
+        mBinding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Añadir palabra al listado
+                listado.add("Palabra "+ listado.size());
+                // Notificamos al adapter que la data cambio.
+                mBinding.rv.getAdapter().notifyItemInserted(listado.size());
+                //Scroll al final
+                mBinding.rv.smoothScrollToPosition(listado.size());
+            }
+        });
+
     }
 
     private List<String> wordList(){
-        List<String> listado = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             listado.add("Palabra "+ i);
         }
         return listado;
     }
 
+    @Override
+    public void passElement(String elemento) {
+      Log.d("PRIMERFRAGMENTO", elemento);
+
+      // se inicia el segundo fragmento cuando hacen click en uno de los elementos del adapter.
+        Navigation.findNavController(mBinding.getRoot())
+                .navigate(R.id.action_FirstFragment_to_SecondFragment);
+    }
 }

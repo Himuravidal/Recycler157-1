@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,9 +20,13 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.WordViewHold
     // 1. Añadimos una lista de String que contendra los datos
     private List<String> mWordList;
 
+    //Referencia a la interface
+    private PasarElemento pasarElemento;
+
     //8. Creamos un constructor para pasar el listado de datos al instanciar el adapter.
-    public WordsAdapter(List<String> mWordList) {
+    public WordsAdapter(List<String> mWordList, PasarElemento pasarElemento) {
         this.mWordList = mWordList;
+        this.pasarElemento = pasarElemento;
     }
 
     @NonNull
@@ -48,12 +53,29 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.WordViewHold
     }
 
     //2. Crear clase interna llamada XXX ViewHolder
-    public class WordViewHolder extends RecyclerView.ViewHolder {
+    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView textView;
         public WordViewHolder(@NonNull WordItemListBinding mBinding) {
             super(mBinding.getRoot());
             textView = mBinding.textView;
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            String element = mWordList.get(position);
+           // Toast.makeText(v.getContext(), element, Toast.LENGTH_SHORT).show();
+            mWordList.set(position,element + "Click");
+            notifyDataSetChanged();
+            pasarElemento.passElement(element);
+        }
+    }
+
+
+    //Interface con un metodo que recibira la palabra a pasar al primer fragmento
+    public interface PasarElemento{
+        void passElement(String elemento);
     }
 
 }
